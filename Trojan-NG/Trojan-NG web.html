@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TROJAN-NG | Control Panel</title>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;background:#050607;color:#00ff66;
+font-family:Consolas,monospace
+}
+header{
+padding:22px;background:#090d0b;
+border-bottom:1px solid #00ff66;
+text-align:center;box-shadow:0 0 20px #00ff6633
+}
+h1{
+font-size:38px;letter-spacing:8px;
+text-shadow:0 0 15px #00ff66
+}
+.subtitle{color:#888}
+.container{max-width:1100px;margin:25px auto;padding:15px}
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:15px
+}
+.panel{
+background:#0b100d;border:1px solid #164b2c;
+padding:20px;box-shadow:0 0 12px #00ff6610
+}
+.panel h3{
+color:#00ff66;border-bottom:1px solid #164b2c;
+padding-bottom:10px
+}
+.value{font-size:25px;color:white}
+.red{color:#ff3333}
+button{
+background:#001d0b;color:#00ff66;
+border:1px solid #00ff66;padding:13px 25px;
+font-family:inherit;cursor:pointer;margin:8px 5px
+}
+button:hover{
+background:#00ff66;color:black;
+box-shadow:0 0 20px #00ff66
+}
+.terminal{
+height:260px;overflow:auto;background:#020403;
+border:1px solid #164b2c;padding:15px;font-size:13px
+}
+.line{margin:7px 0}
+.bar{height:12px;background:#17251b;margin-top:10px}
+.progress{
+height:100%;width:0%;background:#00ff66;
+transition:width .3s
+}
+footer{text-align:center;padding:25px;color:#555}
+canvas{position:fixed;inset:0;z-index:-1;opacity:.18}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<header>
+<h1>TROJAN-NG</h1>
+<div class="subtitle">ADVANCED CYBER SECURITY INTERFACE</div>
+<p class="red">⚠ SYSTEM SECURITY ACTIVE ⚠</p>
+</header>
+
+<div class="container">
+<div class="grid">
+
+<div class="panel">
+<h3>SYSTEM STATUS</h3>
+<div class="value" id="status">STANDBY</div>
+<p>Security: ACTIVE</p>
+<p>Threat level: <span class="red">UNKNOWN</span></p>
+</div>
+
+<div class="panel">
+<h3>NETWORK STATUS</h3>
+<div class="value">ONLINE</div>
+<p>Connection: LOCAL</p>
+<p>Encryption: AES-256</p>
+</div>
+
+<div class="panel">
+<h3>THREAT DETECTION</h3>
+<div class="value red" id="threats">00</div>
+<p>Threats detected</p>
+</div>
+</div>
+
+<br>
+
+<div class="panel">
+<h3>CONTROL CENTER</h3>
+<button onclick="startScan()">▶ START SCAN</button>
+<button onclick="stopScan()">■ STOP SCAN</button>
+<button onclick="clearLog()">CLEAR TERMINAL</button>
+<div class="bar"><div class="progress" id="progress"></div></div>
+<p id="percentage">SCAN PROGRESS: 0%</p>
+</div>
+
+<br>
+
+<div class="panel">
+<h3>LIVE TERMINAL</h3>
+<div class="terminal" id="terminal">
+<div class="line">[SYSTEM] TROJAN-NG INITIALIZED</div>
+<div class="line">[SYSTEM] Welcome to the control panel.</div>
+<div class="line">[SECURITY] Security environment ready.</div>
+<div class="line">[STATUS] Waiting for user command...</div>
+</div>
+</div>
+
+<br>
+
+<div class="grid">
+<div class="panel">
+<h3>FIREWALL</h3>
+<div class="value">ACTIVE</div>
+<p>Protection enabled</p>
+</div>
+<div class="panel">
+<h3>SCANNER</h3>
+<div class="value" id="scanner">IDLE</div>
+<p>Security scanner</p>
+</div>
+<div class="panel">
+<h3>SESSION</h3>
+<div class="value" id="clock">00:00:00</div>
+<p>Current session time</p>
+</div>
+</div>
+</div>
+
+<footer>
+TROJAN-NG © 2026 | ADVANCED SYSTEM CONTROL
+</footer>
+
+<script>
+let progress=0;
+let scan=null;
+let seconds=0;
+
+const terminal=document.getElementById("terminal");
+
+function log(message){
+const line=document.createElement("div");
+line.className="line";
+line.textContent="[TROJAN-NG] "+message;
+terminal.appendChild(line);
+terminal.scrollTop=terminal.scrollHeight;
+}
+
+function startScan(){
+if(scan)return;
+if(progress>=100)progress=0;
+
+document.getElementById("status").textContent="SCANNING";
+document.getElementById("scanner").textContent="RUNNING";
+log("Initializing security scan...");
+
+scan=setInterval(()=>{
+progress+=2;
+document.getElementById("progress").style.width=progress+"%";
+document.getElementById("percentage").textContent=
+"SCAN PROGRESS: "+progress+"%";
+
+if(Math.random()>.75){
+log("Analyzing security module...");
+}
+
+if(progress>=100){
+clearInterval(scan);
+scan=null;
+document.getElementById("status").textContent="COMPLETE";
+document.getElementById("scanner").textContent="IDLE";
+log("Security scan completed successfully.");
+}
+},150);
+}
+
+function stopScan(){
+clearInterval(scan);
+scan=null;
+if(progress<100){
+document.getElementById("status").textContent="STOPPED";
+document.getElementById("scanner").textContent="IDLE";
+log("Scan stopped by user.");
+}
+}
+
+function clearLog(){
+terminal.innerHTML="";
+log("Terminal cleared.");
+}
+
+setInterval(()=>{
+seconds++;
+let h=String(Math.floor(seconds/3600)).padStart(2,"0");
+let m=String(Math.floor(seconds/60)%60).padStart(2,"0");
+let s=String(seconds%60).padStart(2,"0");
+document.getElementById("clock").textContent=h+":"+m+":"+s;
+},1000);
+
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+let drops=[];
+
+function resize(){
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+drops=Array(Math.floor(canvas.width/18)).fill(1);
+}
+resize();
+window.addEventListener("resize",resize);
+
+setInterval(()=>{
+ctx.fillStyle="rgba(0,0,0,0.08)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#00ff66";
+ctx.font="15px monospace";
+
+drops.forEach((y,i)=>{
+ctx.fillText(Math.random()>.5?"1":"0",i*18,y*18);
+if(y*18>canvas.height&&Math.random()>.97)drops[i]=0;
+drops[i]++;
+});
+},50);
+</script>
+</body>
+</html>
